@@ -1,72 +1,63 @@
 <?php
-header('Content-Type: application/json');
+// process_booking.php
 
-try {
-    // Read input
-    $input = file_get_contents('php://input');
-    $data = json_decode($input, true);
+// Set content type to JSON
+header("Content-Type: application/json");
 
-    // Validate input
-    if (
-        isset($data['room_id'], $data['name'], $data['email'], $data['phone'], $data['checkin'], $data['checkout'])
-    ) {
-        $roomId = intval($data['room_id']);
-        $name = htmlspecialchars($data['name']);
-        $email = htmlspecialchars($data['email']);
-        $phone = htmlspecialchars($data['phone']);
-        $checkin = htmlspecialchars($data['checkin']);
-        $checkout = htmlspecialchars($data['checkout']);
+// Get the raw POST data
+$rawData = file_get_contents('php://input');
 
-        // Database connection
-        $conn = new mysqli('localhost', 'root', '', 'luxury_hotel');
-        if ($conn->connect_error) {
-            echo json_encode(['success' => false, 'error' => 'Database connection failed: ' . $conn->connect_error]);
-            exit;
-        }
+// Decode the incoming JSON data
+$data = json_decode($rawData, true);
 
-        // Check room availability
-        $availabilityQuery = "SELECT available_rooms, name FROM rooms WHERE id = ? AND is_available = 1";
-        $stmt = $conn->prepare($availabilityQuery);
-        $stmt->bind_param("i", $roomId);
-        $stmt->execute();
-        $result = $stmt->get_result();
+// Check if data was decoded successfully
+if (!$data) {
+    echo json_encode(['success' => false, 'error' => 'Invalid JSON data']);
+    exit;
+}
 
-        if ($result && $result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $availableRooms = $row['available_rooms'];
-            $roomName = $row['name'];
+// Validate required fields
+if (isset($data['room_id'], $data['name'], $data['email'], $data['phone'], $data['checkin'], $data['checkout'], $data['persons'])) {
+    $room_id = $data['room_id'];
+    $name = $data['name'];
+    $email = $data['email'];
+    $phone = $data['phone'];
+    $checkin = $data['checkin'];
+    $checkout = $data['checkout'];
+    $persons = $data['persons'];
 
-            if ($availableRooms > 0) {
-                // Insert booking
-                $insertQuery = "INSERT INTO bookings (room_id, customer_name, customer_email, phone_number, check_in, check_out)
-                                VALUES (?, ?, ?, ?, ?, ?)";
-                $stmt = $conn->prepare($insertQuery);
-                $stmt->bind_param("isssss", $roomId, $name, $email, $phone, $checkin, $checkout);
+    // Create a connection to the database
+    $servername = "localhost";
+    $username = "root";
+    $password = "";
+    $dbname = "luxury_hotel";
 
-                if ($stmt->execute()) {
-                    // Update available rooms
-                    $updateRooms = "UPDATE rooms SET available_rooms = available_rooms - 1 WHERE id = ?";
-                    $stmt = $conn->prepare($updateRooms);
-                    $stmt->bind_param("i", $roomId);
-                    $stmt->execute();
+    $conn = new mysqli($servername, $username, $password, $dbname);
 
-                    echo json_encode(['success' => true, 'room_name' => $roomName]);
-                } else {
-                    echo json_encode(['success' => false, 'error' => 'Failed to insert booking.']);
-                }
-            } else {
-                echo json_encode(['success' => false, 'error' => 'No rooms available.']);
-            }
-        } else {
-            echo json_encode(['success' => false, 'error' => 'Room not found or unavailable.']);
-        }
-
-        $stmt->close();
-        $conn->close();
-    } else {
-        echo json_encode(['success' => false, 'error' => 'Invalid input.']);
+    // Check if the connection was successful
+    if ($conn->connect_error) {
+        echo json_encode(['success' => false, 'error' => 'Database connection failed']);
+        exit;
     }
-} catch (Exception $e) {
-    echo json_encode(['success' => false, 'error' => 'An error occurred: ' . $e->getMessage()]);
+
+    // Prepare SQL statement to prevent SQL injection
+    $stmt = $conn->prepare("INSERT INTO bookings (room_id, customer_name, customer_email, phone_number, check_in, check_out, persons) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("issssss", $room_id, $name, $email, $phone, $checkin, $checkout, $persons);
+
+    // Execute the query
+    if ($stmt->execute()) {
+        // Return success message
+        echo json_encode(['success' => true, 'message' => 'Booking successfully saved']);
+    } else {
+        // Return error message if query failed
+        echo json_encode(['success' => false, 'error' => 'Failed to save booking']);
+    }
+
+    // Close the statement and connection
+    $stmt->close();
+    $conn->close();
+} else {
+    // Missing required data
+    echo json_encode(['success' => false, 'error' => 'Missing required data']);
 }
 ?>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Confirmation</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="logo">Luxury Stays</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="rooms.html">Rooms</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Booking Confirmation Section -->
+  <section id="booking-confirmation">
+    <div class="confirmation-content">
+      <h2>Booking Successful!</h2>
+      <p><strong>Room:</strong> <span id="room-name"></span></p>
+      <p><strong>Name:</strong> <span id="user-name"></span></p>
+      <p><strong>Email:</strong> <span id="user-email"></span></p>
+      <p><strong>Phone:</strong> <span id="user-phone"></span></p>
+      <p><strong>Check-in:</strong> <span id="checkin-date"></span></p>
+      <p><strong>Check-out:</strong> <span id="checkout-date"></span></p>
+      <p><strong>Persons:</strong> <span id="persons"></span></p>
+      <div class="back-home">
+        <a href="index.html" class="cta-button">Go back to homepage</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Luxury Stays. All rights reserved.</p>
+  </footer>
+
+  <script>
+   const urlParams = new URLSearchParams(window.location.search);
+console.log("Room Name:", urlParams.get('room_name')); // Debugging: Check if the room_name is retrieved correctly
+document.getElementById('room-name').textContent = urlParams.get('room_name') || 'N/A';
+document.getElementById('user-name').textContent = urlParams.get('name') || 'N/A';
+document.getElementById('user-email').textContent = urlParams.get('email') || 'N/A';
+document.getElementById('user-phone').textContent = urlParams.get('phone') || 'N/A';
+document.getElementById('checkin-date').textContent = urlParams.get('checkin') || 'N/A';
+document.getElementById('checkout-date').textContent = urlParams.get('checkout') || 'N/A';
+document.getElementById('persons').textContent = urlParams.get('persons') || 'N/A';
+
+  </script>
+</body>
+</html>

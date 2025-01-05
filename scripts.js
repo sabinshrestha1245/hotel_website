@@ -1,15 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
   const roomsGrid = document.getElementById("rooms-grid");
 
-  // Fetch rooms
+  // Fetch rooms and display them
   fetch("fetch_rooms.php")
     .then(response => response.json())
     .then(rooms => {
-      if (rooms.length === 0) {
-        console.log("No rooms available.");
-        return;
-      }
-
       rooms.forEach(room => {
         const roomCard = document.createElement("div");
         roomCard.className = "room-card";
@@ -21,70 +16,56 @@ document.addEventListener("DOMContentLoaded", () => {
           <p class="price">$${room.price} per night</p>
           <div class="buttons">
             <button class="check-btn" data-room-id="${room.id}">Check Availability</button>
-            <button class="book-btn" data-room-id="${room.id}">Book Now</button>
+            <button class="book-btn" data-room-id="${room.id}" data-room-name="${room.name}" data-room-price="${room.price}" data-room-img="${room.img}">Book Now</button>
           </div>
         `;
         roomsGrid.appendChild(roomCard);
       });
     })
-    .catch(error => console.error("Error fetching rooms:", error));
+    .catch(error => {
+      console.error("Error fetching rooms:", error);
+      alert("Unable to fetch rooms at the moment. Please try again later.");
+    });
 
-  // Event listener for both "Book Now" and "Check Availability" buttons
+  // Handle button clicks for booking and checking availability
   document.addEventListener("click", (e) => {
+    const roomId = e.target.getAttribute("data-room-id");
+
     if (e.target && e.target.classList.contains("book-btn")) {
-      const roomId = e.target.getAttribute("data-room-id");
-      console.log("Book Now button clicked, roomId:", roomId);
+      const roomName = e.target.getAttribute("data-room-name");
+      const roomPrice = e.target.getAttribute("data-room-price");
+      const roomImg = e.target.getAttribute("data-room-img");
 
-      // Show booking form and pre-fill room ID
-      const bookingForm = document.getElementById('bookingForm');
-      const roomDetails = document.getElementById('room-details');
+      // Store room details in localStorage
+      localStorage.setItem('room_id', roomId);
+      localStorage.setItem('room_name', roomName);
+      localStorage.setItem('room_price', roomPrice);
+      localStorage.setItem('room_img', roomImg);
 
-      if (bookingForm) {
-        bookingForm.style.display = 'block';
-        document.getElementById('room-id').value = roomId;
-
-        // Fetch room details for display on the booking form
-        fetch(`fetch_room_details.php?room_id=${roomId}`)
-          .then(response => response.json())
-          .then(data => {
-            console.log("Fetched room details:", data);
-            if (data && data.name) {
-              roomDetails.innerHTML = `
-                <h3>Room: ${data.name}</h3>
-                <p>Price: $${data.price} per night</p>
-                <p>${data.description}</p>
-              `;
-            } else {
-              alert("Room details could not be loaded.");
-            }
-          })
-          .catch(error => console.error("Error fetching room details:", error));
-      }
+      // Redirect to booking.html
+      window.location.href = 'booking.html';
     }
 
     if (e.target && e.target.classList.contains("check-btn")) {
-      const roomId = e.target.getAttribute("data-room-id");
-
+      // Fetch availability for the room
       fetch(`check_availability.php?room_id=${roomId}`)
         .then(response => response.json())
         .then(data => {
-          if (data.available) {
-            alert(`Room "${data.room_name}" is available!`);
-          } else {
-            alert(`Sorry, room "${data.room_name}" is not available.`);
-          }
+          const message = data.available
+            ? `Room "${data.room_name}" is available!`
+            : `Sorry, room "${data.room_name}" is not available.`;
+          alert(message);
         })
         .catch(error => console.error("Error checking availability:", error));
     }
   });
 
+  // Handle booking form submission
   const bookingForm = document.getElementById('bookingForm');
   const confirmationPopup = document.getElementById('confirmation-popup');
   const confirmBookingBtn = document.getElementById('confirm-booking');
   const cancelBookingBtn = document.getElementById('cancel-booking');
-  const bookingConfirmationSection = document.getElementById('booking-confirmation');
 
-  // Validate and show confirmation popup upon form submission
   bookingForm.addEventListener('submit', (event) => {
     event.preventDefault();
 
@@ -95,7 +76,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const checkin = document.getElementById('checkin').value;
     const checkout = document.getElementById('checkout').value;
     const persons = document.getElementById('persons').value;
-
     const roomId = document.getElementById('room-id').value;
 
     // Extract first and last names
@@ -127,38 +107,41 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    // Determine max persons based on room type
+    const room = rooms.find(r => r.id === roomId);
+    const maxPersons = room ? (room.name.includes("Standard twin") || room.name.includes("Executive twin") ? 2 :
+      room.name.includes("Superior suite") || room.name.includes("Deluxe suite") || room.name.includes("Executive suite") ? 3 :
+      room.name.includes("Presidential suite") ? 5 : 2) : 2;
+
+    if (persons > maxPersons) {
+      alert(`This room can accommodate up to ${maxPersons} persons.`);
+      return;
+    }
+
     // If all checks pass, show confirmation popup
     confirmationPopup.style.display = 'flex';
   });
 
+  // Cancel booking (close popup)
   cancelBookingBtn.addEventListener('click', () => {
     confirmationPopup.style.display = 'none';
   });
 
+  // Confirm booking and process the booking
   confirmBookingBtn.addEventListener('click', () => {
-    const roomId = document.getElementById('room-id').value;
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const phone = document.getElementById('phone').value;
-    const checkin = document.getElementById('checkin').value;
-    const checkout = document.getElementById('checkout').value;
-    const persons = document.getElementById('persons').value;
-
     const bookingData = {
-      room_id: roomId,
-      name,
-      email,
-      phone,
-      checkin,
-      checkout,
-      persons,
+      room_id: document.getElementById('room-id').value,
+      name: document.getElementById('name').value,
+      email: document.getElementById('email').value,
+      phone: document.getElementById('phone').value,
+      checkin: document.getElementById('checkin').value,
+      checkout: document.getElementById('checkout').value,
+      persons: document.getElementById('persons').value,
     };
 
     fetch('process_booking.php', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(bookingData),
     })
       .then(response => response.json())
@@ -166,18 +149,14 @@ document.addEventListener("DOMContentLoaded", () => {
         confirmationPopup.style.display = 'none';
 
         if (data.success) {
-          bookingConfirmationSection.style.display = 'block';
-
-          document.getElementById('confirm-room-name').innerText = data.room_name || 'N/A';
-          document.getElementById('confirm-name').innerText = name;
-          document.getElementById('confirm-email').innerText = email;
-          document.getElementById('confirm-phone').innerText = phone;
-          document.getElementById('confirm-checkin').innerText = checkin;
-          document.getElementById('confirm-checkout').innerText = checkout;
-          document.getElementById('confirm-persons').innerText = persons;
-
-          // Display the success popup with booking details
-          displayBookingDetailsPopup(name, email, phone, checkin, checkout, persons, data.room_name);
+          // Redirect to booking_confirmation.html with booking data
+          const url = new URL('booking_confirmation.html', window.location.href);
+          Object.keys(data).forEach(key => {
+            if (key !== 'success') {
+              url.searchParams.append(key, data[key]);
+            }
+          });
+          window.location.href = url.toString();
         } else {
           alert(data.error || 'Sorry! There is no available room. Please re-enter booking information.');
           bookingForm.reset();
@@ -188,33 +167,4 @@ document.addEventListener("DOMContentLoaded", () => {
         alert('An error occurred while processing your booking.');
       });
   });
-
-  // Function to display the booking details in a popup
-  function displayBookingDetailsPopup(name, email, phone, checkin, checkout, persons, roomName) {
-    const bookingDetailsPopup = document.createElement('div');
-    bookingDetailsPopup.classList.add('booking-details-popup');
-    
-    bookingDetailsPopup.innerHTML = `
-      <div class="popup-content">
-        <h2>Booking Successful!</h2>
-        <p><strong>Room:</strong> ${roomName}</p>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Phone:</strong> ${phone}</p>
-        <p><strong>Check-in:</strong> ${checkin}</p>
-        <p><strong>Check-out:</strong> ${checkout}</p>
-        <p><strong>Persons:</strong> ${persons}</p>
-        <button id="close-popup-btn">OK</button>
-      </div>
-    `;
-
-    document.body.appendChild(bookingDetailsPopup);
-
-    // Close the popup when the user clicks the OK button
-    document.getElementById('close-popup-btn').addEventListener('click', () => {
-      bookingDetailsPopup.style.display = 'none';
-    });
-
-    bookingDetailsPopup.style.display = 'block';
-  }
 });

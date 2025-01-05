@@ -24,46 +24,163 @@
     <form id="bookingForm">
       <!-- Hidden room ID -->
       <input type="hidden" id="room-id" name="room-id">
-      <div id="room-details"></div>
+      
+      <div id="room-details">
+        <label for="room-name">Room Name:</label>
+        <input type="text" id="room-name" name="room-name" readonly>
+        
+        <label for="room-price">Room Price:</label>
+        <input type="text" id="room-price" name="room-price" readonly>
+        
+        <label for="room-img">Room Image:</label>
+        <img id="room-img" alt="Room Image" style="width: 100px;">
+      </div>
+      
       <label for="name">Full Name:</label>
-      <input type="text" id="name" name="name" required>
+      <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+
       <label for="email">Email:</label>
-      <input type="email" id="email" name="email" required>
+      <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
       <label for="phone">Phone Number:</label>
-      <input type="tel" id="phone" name="phone" required>
+      <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+
       <label for="checkin">Check-in Date:</label>
       <input type="date" id="checkin" name="checkin" required>
+
       <label for="checkout">Check-out Date:</label>
       <input type="date" id="checkout" name="checkout" required>
+
       <label for="persons">Number of Persons:</label>
-      <input type="number" id="persons" name="persons" required>
+      <input type="number" id="persons" name="persons" min="1" placeholder="Enter number of persons" required>
+
       <button type="button" id="cancel-btn">Cancel</button>
-      <button type="submit">Book Now</button>
+      <button type="submit" id="submit-btn">Submit</button>
     </form>
   </section>
 
-  <!-- Confirmation Pop-up -->
-  <div id="confirmation-popup" class="popup">
-    <div class="popup-content">
+  <!-- Confirmation Popup -->
+  <div id="confirmation-popup" style="display: none;">
+    <div id="confirmation-content">
       <h3>Confirm Your Booking</h3>
-      <p>Are you sure you want to book this room?</p>
-      <button id="confirm-booking">Yes</button>
-      <button id="cancel-booking">No</button>
+      <p>Please review your booking details before confirming.</p>
+      <button id="cancel-booking">Cancel</button>
+      <button id="confirm-booking">Confirm Booking</button>
     </div>
   </div>
 
-  <!-- Booking Confirmation Section -->
-  <section id="booking-confirmation" class="hidden">
-    <h2>Booking Confirmed</h2>
-    <p><strong>Room:</strong> <span id="confirm-room-name"></span></p>
-    <p><strong>Name:</strong> <span id="confirm-name"></span></p>
-    <p><strong>Email:</strong> <span id="confirm-email"></span></p>
-    <p><strong>Phone:</strong> <span id="confirm-phone"></span></p>
-    <p><strong>Check-in:</strong> <span id="confirm-checkin"></span></p>
-    <p><strong>Check-out:</strong> <span id="confirm-checkout"></span></p>
-    <p><strong>Persons:</strong> <span id="confirm-persons"></span></p>
-  </section>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Retrieve room details from localStorage
+      const roomId = localStorage.getItem('room_id');
+      const roomName = localStorage.getItem('room_name');
+      const roomPrice = localStorage.getItem('room_price');
+      const roomImg = localStorage.getItem('room_img');
 
-  <script src="scripts.js"></script>
+      // Populate the form with room details
+      document.getElementById('room-id').value = roomId;
+      document.getElementById('room-name').value = roomName;
+      document.getElementById('room-price').value = `$${roomPrice}`;
+      document.getElementById('room-img').src = roomImg;
+    });
+
+    // Handle booking form submission
+    const bookingForm = document.getElementById('bookingForm');
+    const submitBtn = document.getElementById('submit-btn');
+
+    bookingForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      // Disable the submit button to avoid multiple submissions
+      submitBtn.disabled = true;
+
+      // Validate the booking form
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const checkin = document.getElementById('checkin').value;
+      const checkout = document.getElementById('checkout').value;
+      const persons = document.getElementById('persons').value;
+      const roomId = document.getElementById('room-id').value;
+
+      // Validation checks
+      if (!name) {
+        alert("Please enter your name.");
+        submitBtn.disabled = false;
+        return;
+      }
+      if (!email.includes("@")) {
+        alert("Please enter a valid email address.");
+        submitBtn.disabled = false;
+        return;
+      }
+      if (!phone) {
+        alert("Please enter your phone number.");
+        submitBtn.disabled = false;
+        return;
+      }
+      if (!checkin || !checkout) {
+        alert("Please select check-in and check-out dates.");
+        submitBtn.disabled = false;
+        return;
+      }
+      if (new Date(checkin) >= new Date(checkout)) {
+        alert("Check-out date must be later than check-in date.");
+        submitBtn.disabled = false;
+        return;
+      }
+
+      // Show confirmation popup
+      document.getElementById('confirmation-popup').style.display = 'block';
+      
+      // Confirm the booking
+      document.getElementById('confirm-booking').addEventListener('click', () => {
+        const bookingData = {
+          room_id: roomId,
+          room_name: document.getElementById('room-name').value, // Ensure room name is added here
+          name,
+          email,
+          phone,
+          checkin,
+          checkout,
+          persons,
+        };
+        console.log("Booking Data:", bookingData); // Debugging: Check if room_name exists in bookingData
+
+
+        fetch('process_booking.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(bookingData),
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              alert("The below booking has been successful!");
+              const queryString = new URLSearchParams(bookingData).toString();
+              console.log(queryString); // Debugging: Log the query string to ensure `room_name` is included
+              // Redirect to booking confirmation page
+              window.location.href = `booking_confirmation.html?${queryString}&nocache=${new Date().getTime()}`;
+            } else {
+              alert("Error during booking. Please try again.");
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert("An error occurred while processing your booking.");
+          });
+        document.getElementById('confirmation-popup').style.display = 'none';
+        submitBtn.disabled = false;
+      });
+
+      // Cancel the booking
+      document.getElementById('cancel-booking').addEventListener('click', () => {
+        document.getElementById('confirmation-popup').style.display = 'none';
+        submitBtn.disabled = false;
+      });
+    });
+  </script>
 </body>
 </html>
