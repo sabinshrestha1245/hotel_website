@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Room</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="logo">Luxury Stays</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="rooms.html">Rooms</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Booking Form -->
+  <section id="booking-form">
+    <h2>Book Your Room</h2>
+    <form id="bookingForm">
+      <!-- Hidden room ID -->
+      <input type="hidden" id="room-id" name="room-id">
+      <div id="room-details"></div>
+      <label for="name">Full Name:</label>
+      <input type="text" id="name" name="name" required>
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+      <label for="phone">Phone Number:</label>
+      <input type="tel" id="phone" name="phone" required>
+      <label for="checkin">Check-in Date:</label>
+      <input type="date" id="checkin" name="checkin" required>
+      <label for="checkout">Check-out Date:</label>
+      <input type="date" id="checkout" name="checkout" required>
+      <label for="persons">Number of Persons:</label>
+      <input type="number" id="persons" name="persons" required>
+      <button type="button" id="cancel-btn">Cancel</button>
+      <button type="submit">Book Now</button>
+    </form>
+  </section>
+
+  <!-- Confirmation Pop-up -->
+  <div id="confirmation-popup" class="popup">
+    <div class="popup-content">
+      <h3>Confirm Your Booking</h3>
+      <p>Are you sure you want to book this room?</p>
+      <button id="confirm-booking">Yes</button>
+      <button id="cancel-booking">No</button>
+    </div>
+  </div>
+
+  <!-- Booking Confirmation Section -->
+  <section id="booking-confirmation" class="hidden">
+    <h2>Booking Confirmed</h2>
+    <p><strong>Room:</strong> <span id="confirm-room-name"></span></p>
+    <p><strong>Name:</strong> <span id="confirm-name"></span></p>
+    <p><strong>Email:</strong> <span id="confirm-email"></span></p>
+    <p><strong>Phone:</strong> <span id="confirm-phone"></span></p>
+    <p><strong>Check-in:</strong> <span id="confirm-checkin"></span></p>
+    <p><strong>Check-out:</strong> <span id="confirm-checkout"></span></p>
+    <p><strong>Persons:</strong> <span id="confirm-persons"></span></p>
+  </section>
+
+  <script src="scripts.js"></script>
+</body>
+</html>

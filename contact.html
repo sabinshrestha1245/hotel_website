@@ -1,0 +1,187 @@
+<?php
+include('db.php');
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complete Responsive zoo website</title>
+    <!-- font awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/regular.min.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css" />
+
+    <link rel="stylesheet" href="css/style.css">
+    
+</head>
+<body>
+
+  
+    
+    <!-- header -->
+
+    <header class="header">
+
+        <a href="#" class="logo"> <i class="fas fa-paw"></i> Wildlife Rescue</a>
+
+        <nav class="navbar">
+            <a href="index.php">Home</a>
+            <a href="about.php">About</a>
+            <a href="services.php">Services</a>
+            <a href="gallery.php">Gallery</a>
+            <a href="news.php">News</a>
+            
+            <div class="dropdown">
+                <a class="dropbtn">Volunteer with us 
+                    <i class="fa fa-caret-down"></i>
+                </a>
+                <div class="dropdown-content">
+                    <a href="#volunteer">Volunteer Opportunities</a>
+                    <a href="#training">Training and Orientation</a>
+                    <a href="#events">Upcoming Events and Workshops</a>
+                    <a href="#education">Wildlife Education Resources</a>
+                    <a href="#help">Give helping hands</a>
+
+                </div>
+            </div>
+            
+            <a href="donation.php" id="donation-box">Donation <i class="far fa-heart"></i></a>
+            <a href="contact.php">Contact</a>
+        </nav>
+        
+      
+
+        <div class="icons">
+            <a href="./login.php">
+                <i class="fas fa-user"></i>
+            </a>
+            <div id="menu-btn" class="fas fa-bars"></div>
+        </div>
+        
+
+       
+    <form action="" class="login-form">
+
+        <h3>login form</h3>
+        
+        <input type="email" placeholder="Enter your email" class="box">
+        <input type="password" placeholder="Enter your password" class="box">
+        <div class="remember">
+            <input type="checkbox" name="" id="remember-me">
+            <label for="remember-me">remember me</label>
+        </div>
+        <a href="login" class="btn">login</a><br>
+        <p>forgot password</p>
+        <a href="#" class="btn">create new account</a>
+
+    </form>
+
+    </header>
+
+
+    <!-- end -->
+ <!-- contact -->
+
+ <section class="contact" id="contact">
+
+    <h2 class="heading">contact</h2>
+
+    <form action="">
+
+        <div class="inputBox">
+            <input type="text" placeholder="name">
+            <input type="email" placeholder="email">
+        </div>
+
+        <div class="inputBox">
+            <input type="number" placeholder="number">
+            <input type="text" placeholder="subject">
+        </div>
+
+        <textarea name="" id="" cols="30" rows="10" placeholder="meassage"></textarea>
+
+        <a href="#" class="btn">send message</a>
+
+    </form>
+
+</section>
+
+<!-- end -->
+
+
+
+
+
+  <!-- footer -->
+
+  <section class="footer">
+
+      <div class="box-container">
+
+          <div class="box">
+              <h3><i class="fas fa-paw"></i> Wildlife Rescue</h3>
+              <p>Rescuing Lives, One Paw at a Time 🐾.</p>
+              <p class="links"><i class="fas fa-clock"></i>monday - friday</p>
+              <p class="days">9:00AM - 7:00PM</p>
+          </div>
+
+          <div class="box">
+              <h3>Contact Info</h3>
+              <a href="#" class="links"><i class="fas fa-phone"></i> 0451094216</a>
+              <a href="#" class="links"><i class="fas fa-globe"></i> social media </a>
+              <a href="#" class="links"><i class="fas fa-envelope"></i> shresthasahash@outlook.com</a>
+              <a href="#" class="links"><i class="fas fa-map-marker-alt"></i> Sydney, Australia</a>
+          </div>
+
+          <div class="box">
+              <h3>quick links</h3>
+              <a href="index.php" class="links"> <i class="fas fa-arrow-right"></i>Home</a>
+              <a href="about.php" class="links"> <i class="fas fa-arrow-right"></i>About</a>
+              <a href="services.php" class="links"> <i class="fas fa-arrow-right"></i>Services</a>
+              <a href="gallery.php" class="links"> <i class="fas fa-arrow-right"></i>Gallery</a>
+              <a href="news.php" class="links"> <i class="fas fa-arrow-right"></i>News</a>
+              <a href="donation.php" class="links"> <i class="fas fa-arrow-right"></i>Donation</a>
+          </div>
+
+          <div class="box">
+              <h3>Feedback</h3>
+              <p>Let's give us feedback</p>
+              <input type="email" placeholder="Your Email" class="email">
+              <a href="#" class="btn">feedback</a>
+              <div class="share">
+                  <a href="https://www.facebook.com/newarko.xoroma.96?mibextid=ZbWKwL" class="fab fa-facebook-f"></a>
+                  <a href="https://www.youtube.com/@Sahasshresthavlog" class="fab fa-youtube"></a>
+                  <a href="https://www.instagram.com/icy_sas836/" class="fab fa-instagram"></a>
+                  <a href="https://www.linkedin.com/in/sahas-shrestha-8aa1732b1/?trk=public-profile-join-page" class="fab fa-linkedin"></a>
+              </div>
+          </div>
+
+      </div>
+
+      <div class="credit">&copy; 2024 Wildlife Rescue. All rights reserved by <a href="https://www.instagram.com/icy_sas836/" class="link">sahas</a></div>
+
+    </section>
+    
+    <!-- end -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <script src="https://unpkg.com/swiper@7/swiper-bundle.min.js"></script>
+    
+    <script src="js/script.js"></script>
+    
+    </body>
+    </html>
